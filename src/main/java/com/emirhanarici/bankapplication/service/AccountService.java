@@ -4,8 +4,13 @@ import com.emirhanarici.bankapplication.dto.AccountDTO;
 import com.emirhanarici.bankapplication.dto.TransactionDTO;
 import com.emirhanarici.bankapplication.exception.AccountNotFoundException;
 import com.emirhanarici.bankapplication.mapper.TransactionMapper;
-import com.emirhanarici.bankapplication.model.Account;
+import com.emirhanarici.bankapplication.model.*;
+import com.emirhanarici.bankapplication.model.enums.TransactionType;
+import com.emirhanarici.bankapplication.payload.request.CreateCreditRequest;
+import com.emirhanarici.bankapplication.payload.request.CreatePhoneBillPaymentRequest;
+import com.emirhanarici.bankapplication.payload.request.CreateWithdrawalRequest;
 import com.emirhanarici.bankapplication.payload.request.CreatedAccountRequest;
+import com.emirhanarici.bankapplication.payload.response.TransactionResponse;
 import com.emirhanarici.bankapplication.repository.AccountRepository;
 import com.emirhanarici.bankapplication.repository.TransactionRepository;
 import jakarta.transaction.Transactional;
@@ -87,8 +92,87 @@ public class AccountService {
                 .build();
     }
 
+    /**
+     * Processes a credit transaction by adding funds to the specified account.
+     *
+     * @param createCreditRequest The request for creating a credit transaction, including account number and amount.
+     * @return The transaction response.
+     */
+    public TransactionResponse credit(CreateCreditRequest createCreditRequest) {
 
+        Account account = accountRepository.findByAccountNumber(createCreditRequest.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Account Not Found : " + createCreditRequest.getAccountNumber()));
 
+        String approvalCode = UUID.randomUUID().toString();
+
+        Transaction transaction = new DepositTransaction(createCreditRequest.getAmount());
+        transaction.setApprovalCode(approvalCode);
+        transaction.setTransactionType(TransactionType.DepositTransaction);
+        transaction.setAccount(account);
+        transaction.executeOn(account);
+
+        accountRepository.save(account);
+
+        return TransactionResponse.builder()
+                .status("OK")
+                .approvalCode(approvalCode)
+                .build();
+    }
+
+    /**
+     * Processes a debit transaction by withdrawing funds from the specified account.
+     *
+     * @param createWithdrawalRequest The request for creating a debit transaction, including account number and amount.
+     * @return The transaction response.
+     */
+    public TransactionResponse debit(CreateWithdrawalRequest createWithdrawalRequest){
+
+        Account account = accountRepository.findByAccountNumber(createWithdrawalRequest.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Account Not Found : " + createWithdrawalRequest.getAccountNumber()));
+
+        String approvalCode = UUID.randomUUID().toString();
+
+        Transaction transaction =  new WithdrawalTransaction(createWithdrawalRequest.getAmount());
+        transaction.setApprovalCode(approvalCode);
+        transaction.setTransactionType(TransactionType.WithdrawalTransaction);
+        transaction.setAccount(account);
+        transaction.executeOn(account);
+
+        accountRepository.save(account);
+
+        return TransactionResponse.builder()
+                .status("OK")
+                .approvalCode(approvalCode)
+                .build();
+
+    }
+
+    /**
+     * Processes a payment transaction by paying a phone bill from the specified account.
+     *
+     * @param createPhoneBillPaymentRequest The request for creating a phone bill payment transaction, including account number and amount.
+     * @return The transaction response.
+     */
+    public TransactionResponse payment(CreatePhoneBillPaymentRequest createPhoneBillPaymentRequest){
+
+        Account account = accountRepository.findByAccountNumber(createPhoneBillPaymentRequest.getAccountNumber())
+                .orElseThrow(() -> new AccountNotFoundException("Account Not Found : " + createPhoneBillPaymentRequest.getAccountNumber()));
+
+        String approvalCode = UUID.randomUUID().toString();
+
+        Transaction transaction =  new PhoneBillPaymentTransaction(createPhoneBillPaymentRequest.getAmount());
+        transaction.setApprovalCode(approvalCode);
+        transaction.setTransactionType(TransactionType.PhoneBillPaymentTransaction);
+        transaction.setAccount(account);
+        transaction.executeOn(account);
+
+        accountRepository.save(account);
+
+        return TransactionResponse.builder()
+                .status("OK")
+                .approvalCode(approvalCode)
+                .build();
+    }
 
 
 
@@ -131,6 +215,7 @@ public class AccountService {
         Optional<Account> existingAccount = accountRepository.findByAccountNumber(accountNumber);
         return existingAccount.isEmpty();
     }
+
 
 
 }
