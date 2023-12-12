@@ -12,3 +12,21 @@ The banking system's object model integrates transaction objects, such as Deposi
 
 All transactions must include date and amount fields, with the date field automatically calculating the transaction time.
 
+### Technologies
+
+---
+- Java 17
+- Spring Boot 3.2
+- Restful API
+- Lombok
+- Maven
+- Junit5
+- Mockito
+- Integration Tests
+- Docker
+- Docker Compose
+- CI/CD (Github Actions)
+- Postman
+- Actuator
+- Swagger 3
+- PostgreSQL

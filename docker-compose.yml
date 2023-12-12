@@ -2,13 +2,34 @@ version: '3.8'
 
 services:
   db:
-    image: mysql
+    image: postgres:13.1-alpine
     restart: always
     container_name: bankingapp-db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: bankingapp-db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
+      POSTGRES_DB: bankingapp-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
     ports:
-      - '3307:3306'
+      - '5432:5432'
+    networks:
+      - bankingappNetwork
+
+  bankingapp:
+    image: 'bankingapp:latest'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bankingapp
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.datasource.url=jdbc:postgresql://db:5432/bankingapp-db
+    depends_on:
+      - db
+    networks:
+      - bankingappNetwork
+
+networks:
+  bankingappNetwork:
+    driver: bridge
+
