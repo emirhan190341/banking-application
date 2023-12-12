@@ -13,15 +13,5 @@ public class BankApplication {
 		SpringApplication.run(BankApplication.class, args);
 	}
 
-	@Bean
-	CommandLineRunner commandLineRunner(JdbcConnectionDetails jdbc) {
-		return args -> {
-			System.out.println("URL: " + jdbc.getJdbcUrl());
-			System.out.println("Username: " + jdbc.getUsername());
-			System.out.println("Password: " + jdbc.getPassword());
-		};
-
-	}
-
 
 }
