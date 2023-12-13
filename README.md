@@ -30,6 +30,3 @@ All transactions must include date and amount fields, with the date field automa
 - Actuator
 - Swagger 3
 - PostgreSQL
-
-### Screenshots
-![prometheus.jpg](..%2F..%2Fprometheus.jpg)
