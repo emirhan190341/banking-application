@@ -25,7 +25,7 @@ All transactions must include date and amount fields, with the date field automa
 - Integration Tests
 - Docker
 - Docker Compose
-- CI/CD (Github Actions)
+- Prometheus and Grafana
 - Postman
 - Actuator
 - Swagger 3
